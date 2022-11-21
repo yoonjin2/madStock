@@ -15,7 +15,6 @@ from keras.utils import get_custom_objects
 import yfinance as yfin
 from datetime import date
 
-#Activation Calculated In Dimmaxontinuity
 class StockManager:
 
     def __init__(self):
