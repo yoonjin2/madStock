@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow.keras.backend as Back
 import datetime
+import sys
 import pandas as pd
 from tensorflow.keras.layers import Dense
 from tensorflow.keras import Sequential
@@ -15,6 +16,7 @@ from keras.utils import get_custom_objects
 import yfinance as yfin
 from datetime import date
 
+#Activation Calculated In Dimmaxontinuity
 class StockManager:
 
     def __init__(self):
@@ -42,11 +44,11 @@ class StockManager:
         self.activation = acti
     def buildModel(self,x):
         self.model = Sequential()
-        self.model.add(Bidirectional(GRU(units=500,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Bidirectional(LSTM(units=1000,activation=self.activation,return_sequences=True,dtype='float32')))
         self.model.add(Dropout(0.3))
-        self.model.add(Bidirectional(GRU(units=300,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Bidirectional(GRU(units=600,activation=self.activation,return_sequences=True,dtype='float32')))
         self.model.add(Dropout(0.4))
-        self.model.add(Bidirectional(GRU(units=100,activation=self.activation,return_sequences=False,dtype='float32')))
+        self.model.add(Bidirectional(SimpleRNN(units=200,activation=self.activation,return_sequences=False,dtype='float32')))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(units=2,activation = 'sigmoid'))
     def trainModel(self):
@@ -60,7 +62,7 @@ class StockManager:
         stock_data_orig_minmax_mmaxscaled = mmax.fit_transform(stock_data_orig)
         
         # create training data of s samples and t time steps 
-        time_steps=2
+        time_steps=1
         for_periods = 2
         x_train = [] 
         y_train = [] 
@@ -84,20 +86,20 @@ class StockManager:
         enc = LabelEncoder()
         print(self.data.columns.to_list())
         self.buildModel(x_train)
-        self.model.compile(optimizer='nadam', loss='mean_squared_error')
-        self.model.fit(x_train,y_train,batch_size=16,epochs=1000,verbose=1)
+        self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=['accuracy'])
+        self.model.fit(x_train,y_train,batch_size=16,epochs=300,verbose=1)
         self.model.summary()
         pred = self.model.predict(x_test)
         pred = mmax.inverse_transform(pred)
         self.model.save("./trained.h5")
         plt.xlabel('Date',fontsize=10)
         plt.ylabel('Close',fontsize=10)
-        plt.plot(prev[:,1],'r',pred[:,1],'g')
+        plt.plot(prev[:,0],'r',pred[:,0],'g')
         plt.show()
         
 if __name__ == '__main__' :
     st=StockManager()
-    st.setStock("KO")
-    st.setStockTrainingRange("2018","2021")
+    st.setStock(sys.argv[1])
+    st.setStockTrainingRange("2010","2021")
     st.getStock()
     st.trainModel()
