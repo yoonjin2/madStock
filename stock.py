@@ -44,16 +44,28 @@ class StockManager:
         self.activation = acti
     def buildModel(self,x):
         self.model = Sequential()
-        self.model.add(Bidirectional(LSTM(units=1000,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Bidirectional(LSTM(units=100,activation=self.activation,return_sequences=True,dtype='float32')))
         self.model.add(Dropout(0.3))
-        self.model.add(Bidirectional(GRU(units=600,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Bidirectional(GRU(units=60,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Dropout(0.3))
+        self.model.add(Bidirectional(GRU(units=60,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Dropout(0.3))
+        self.model.add(Bidirectional(GRU(units=60,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Dropout(0.3))
+        self.model.add(Bidirectional(SimpleRNN(units=20,activation=self.activation,return_sequences=True,dtype='float32')))
         self.model.add(Dropout(0.4))
-        self.model.add(Bidirectional(SimpleRNN(units=200,activation=self.activation,return_sequences=False,dtype='float32')))
+        self.model.add(Bidirectional(SimpleRNN(units=20,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Dropout(0.4))
+        self.model.add(Bidirectional(SimpleRNN(units=20,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Dropout(0.4))
+        self.model.add(Bidirectional(SimpleRNN(units=20,activation=self.activation,return_sequences=True,dtype='float32')))
+        self.model.add(Dropout(0.4))
+        self.model.add(Bidirectional(SimpleRNN(units=20,activation=self.activation,return_sequences=False,dtype='float32')))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(units=2,activation = 'sigmoid'))
     def trainModel(self):
-        stock_data_orig = self.data[:self.startDate]
-        stock_data_test = self.data[:self.endDate]
+        stock_data_orig = self.data[self.startDate:self.endDate]
+        stock_data_test = self.data[self.endDate:]
         stock_data_orig_len = len(stock_data_orig)
         stock_data_test_len = len(stock_data_test)
         
